@@ -1,85 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../api";
-import Note from "../components/Note"
-import "../styles/Home.css"
+import Chart from "chart.js/auto";
+import "../styles/Home.css";
+import MobileNavbar from "../components/MobileNavbar.jsx";
 
 function Home() {
-    const [notes, setNotes] = useState([]);
-    const [content, setContent] = useState("");
-    const [title, setTitle] = useState("");
+  const [user, setUser] = useState(null);
+  const [stats, setStats] = useState([]);
+  const chartRef = useRef(null);
+  const canvasRef = useRef(null);
 
-    useEffect(() => {
-        getNotes();
-    }, []);
+  useEffect(() => {
+    api.get("/api/user/profile/").then((res) => setUser(res.data)).catch((err) => alert(err));
+    api.get("/api/user/stats/?period=week")
+      .then((res) => {
+        setStats(res.data);
+        if (chartRef.current) chartRef.current.destroy();
+        const ctx = canvasRef.current.getContext("2d");
+        chartRef.current = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: res.data.map((s) => s.date),
+            datasets: [{ label: "Login/Greeting Count", data: res.data.map((s) => s.count), borderColor: "#3b82f6", fill: false }],
+          },
+          options: { responsive: true, scales: { y: { beginAtZero: true } } },
+        });
+      })
+      .catch((err) => alert(err));
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
+  }, []);
 
-    const getNotes = () => {
-        api
-            .get("/api/notes/")
-            .then((res) => res.data)
-            .then((data) => {
-                setNotes(data);
-                console.log(data);
-            })
-            .catch((err) => alert(err));
-    };
-
-    const deleteNote = (id) => {
-        api
-            .delete(`/api/notes/delete/${id}/`)
-            .then((res) => {
-                if (res.status === 204) alert("Note deleted!");
-                else alert("Failed to delete note.");
-                getNotes();
-            })
-            .catch((error) => alert(error));
-    };
-
-    const createNote = (e) => {
-        e.preventDefault();
-        api
-            .post("/api/notes/", { content, title })
-            .then((res) => {
-                if (res.status === 201) alert("Note created!");
-                else alert("Failed to make note.");
-                getNotes();
-            })
-            .catch((err) => alert(err));
-    };
-
-    return (
+  return (
+    <div className="home-container">
+      <div className="home-content">
+        <h1>Hello, {user ? user.username : "Guest"}!</h1>
         <div>
-            <div>
-                <h2>Notes</h2>
-                {notes.map((note) => (
-                    <Note note={note} onDelete={deleteNote} key={note.id} />
-                ))}
-            </div>
-            <h2>Create a Note</h2>
-            <form onSubmit={createNote}>
-                <label htmlFor="title">Title:</label>
-                <br />
-                <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    required
-                    onChange={(e) => setTitle(e.target.value)}
-                    value={title}
-                />
-                <label htmlFor="content">Content:</label>
-                <br />
-                <textarea
-                    id="content"
-                    name="content"
-                    required
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                ></textarea>
-                <br />
-                <input type="submit" value="Submit"></input>
-            </form>
+          <h2>Activity Statistics</h2>
+          <canvas ref={canvasRef} id="statsChart" style={{ maxWidth: "100%" }}></canvas>
         </div>
-    );
+      </div>
+      <MobileNavbar />
+    </div>
+  );
 }
 
 export default Home;

@@ -9,7 +9,7 @@
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
   }
-  
+
   .mobile-nav-list {
     display: flex;
     justify-content: space-around;
@@ -18,7 +18,7 @@
     margin: 0;
     padding: 5px 0;
   }
-  
+
   .mobile-nav-link {
     display: flex;
     flex-direction: column;
@@ -28,24 +28,24 @@
     padding: 8px;
     font-size: 12px;
   }
-  
+
   .mobile-nav-icon {
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
   }
-  
+
   .mobile-nav-link:hover {
     color: #bbf7d0; /* Lighter green on hover */
   }
-  
+
   /* Mobile Responsive Styles */
   @media (max-width: 640px) {
     .mobile-nav {
-      display: block; /* Show on mobile */
+      display: block !important; /* Show on mobile */
     }
   }
-  
+
   @media (min-width: 641px) {
     .mobile-nav {
       display: none; /* Hide on larger screens */

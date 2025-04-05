@@ -1,41 +1,43 @@
-// File: src/components/MobileNavbar.tsx (or wherever you prefer)
 import React from 'react';
 import { Home, Search, PlusCircle, Send, User } from 'lucide-react';
-import '../styles/MobileNavbar.css'; // Adjust path based on your structure
+import '../styles/MobileNavbar.css';
+import { Link, useLocation } from 'react-router-dom'; // Import Link and useLocation
 
-const MobileNavbar: React.FC = () => {
+const MobileNavbar = () => {
+  const location = useLocation(); // Get current location
+
   return (
     <nav className="mobile-nav">
       <ul className="mobile-nav-list">
         <li>
-          <a href="#" className="mobile-nav-link">
+          <Link to="/" className={`mobile-nav-link ${location.pathname === '/' ? 'active' : ''}`}>
             <Home className="mobile-nav-icon" />
             <span>Home</span>
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="#" className="mobile-nav-link">
+          <Link to="#" className="mobile-nav-link">
             <Search className="mobile-nav-icon" />
             <span>Search</span>
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="#" className="mobile-nav-link">
+          <Link to="/add-item" className={`mobile-nav-link ${location.pathname === '/add-item' ? 'active' : ''}`}>
             <PlusCircle className="mobile-nav-icon" />
             <span>Add</span>
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="#" className="mobile-nav-link">
+          <Link to="#" className="mobile-nav-link">
             <Send className="mobile-nav-icon" />
             <span>Request</span>
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="#" className="mobile-nav-link">
+          <Link to="#" className="mobile-nav-link">
             <User className="mobile-nav-icon" />
             <span>Profile</span>
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>

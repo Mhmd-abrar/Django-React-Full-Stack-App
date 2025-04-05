@@ -1,34 +1,42 @@
-from django.shortcuts import render
+from rest_framework.response import Response
 from django.contrib.auth.models import User
-from rest_framework import generics
-from .serializers import UserSerializer, NoteSerializer
+from rest_framework import generics, views
+from .serializers import UserSerializer, UserActivitySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Note
+from .models import UserActivity
+from django.utils import timezone
+from django.db.models import Count
+from datetime import timedelta
 
-
-class NoteListCreate(generics.ListCreateAPIView):
-    serializer_class = NoteSerializer
+class UserProfileView(views.APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return Note.objects.filter(author=user)
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            serializer.save(author=self.request.user)
-        else:
-            print(serializer.errors)
-
-
-class NoteDelete(generics.DestroyAPIView):
-    serializer_class = NoteSerializer
+class UserStatsView(views.APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return Note.objects.filter(author=user)
+    def get(self, request):
+        period = request.query_params.get("period", "week")
+        user = request.user
+        end_date = timezone.now().date()
+        if period == "week":
+            start_date = end_date - timedelta(days=7)
+        elif period == "month":
+            start_date = end_date - timedelta(days=30)
+        else:  # day
+            start_date = end_date - timedelta(days=1)
 
+        stats = (UserActivity.objects
+                 .filter(user=user, date__range=[start_date, end_date])
+                 .values('date')
+                 .annotate(count=Count('id'))
+                 .order_by('date'))
+        serializer = UserActivitySerializer(stats, many=True)
+        return Response(serializer.data)
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
