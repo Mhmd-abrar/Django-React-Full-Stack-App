@@ -1,10 +1,11 @@
+// src/components/MobileNavbar.jsx
 import React from 'react';
 import { Home, Search, PlusCircle, Send, User } from 'lucide-react';
 import '../styles/MobileNavbar.css';
-import { Link, useLocation } from 'react-router-dom'; // Import Link and useLocation
+import { Link, useLocation } from 'react-router-dom';
 
 const MobileNavbar = () => {
-  const location = useLocation(); // Get current location
+  const location = useLocation();
 
   return (
     <nav className="mobile-nav">
@@ -16,7 +17,7 @@ const MobileNavbar = () => {
           </Link>
         </li>
         <li>
-          <Link to="#" className="mobile-nav-link">
+          <Link to="/search" className={`mobile-nav-link ${location.pathname === '/search' ? 'active' : ''}`}>
             <Search className="mobile-nav-icon" />
             <span>Search</span>
           </Link>
@@ -34,7 +35,7 @@ const MobileNavbar = () => {
           </Link>
         </li>
         <li>
-          <Link to="#" className="mobile-nav-link">
+          <Link to="/profile" className="mobile-nav-link">
             <User className="mobile-nav-icon" />
             <span>Profile</span>
           </Link>

@@ -1,52 +1,39 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { User, Edit2, Save, Home, Search, PlusCircle, Send, Camera, X, Bell, BellOff } from 'lucide-react';
+// src/pages/ProfilePage.jsx
+import React, { useState, useEffect } from 'react';
+import { User, Edit2, Save, PlusCircle, Camera, X, Bell, BellOff } from 'lucide-react';
 import '../styles/ProfilePage.css';
+import api from "../api"; // Your API utility
+import MobileNavbar from "../components/MobileNavbar.jsx";
 
-// Define the shape of user data expected from the backend
-interface UserProfile {
-  name: string;
-  productsBought: number;
-  productsSold: number;
-}
-
-// Extended interface for green interests with additional fields
-interface GreenInterest {
-  category: string;
-  productDescription: string;
-  organization?: string;
-  costPerUnit?: number;
-  notificationsEnabled: boolean;
-}
-
-const ProfilePage: React.FC = () => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+const ProfilePage = () => {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
-  const [greenInterests, setGreenInterests] = useState<GreenInterest[]>([]);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [greenInterests, setGreenInterests] = useState([]);
   const [isEditingInterests, setIsEditingInterests] = useState(false);
   const [isAddingInterest, setIsAddingInterest] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
-  // New state for the form fields
-  const [newInterest, setNewInterest] = useState<GreenInterest>({
+
+  const [newInterest, setNewInterest] = useState({
     category: 'Sustainable Clothing',
     productDescription: '',
     organization: '',
     costPerUnit: undefined,
-    notificationsEnabled: true
+    notificationsEnabled: true,
   });
 
-  // Fetch user data from backend
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch('/userProfile.json', {
-          headers: { 'Authorization': 'Bearer YOUR_TOKEN' }, // Add auth if needed
-        });
-        const data: UserProfile = await response.json();
-        setUser(data);
+        const response = await api.get('/api/user/profile/');
+        setUser(response.data);
+        setGreenInterests([]); // Replace with backend data if available
       } catch (error) {
-        console.error('Failed to fetch user profile:', error);
+        console.error('Failed to fetch user profile:', error.response?.data || error.message);
+        if (error.response?.status === 401) {
+          localStorage.removeItem('access_token');
+          window.location.href = '/login'; // Redirect to login on auth failure
+        }
       } finally {
         setLoading(false);
       }
@@ -55,19 +42,17 @@ const ProfilePage: React.FC = () => {
     fetchUserProfile();
   }, []);
 
-  // Handle profile photo upload
-  const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setProfilePhoto(reader.result as string); // Set the image as a data URL
+        setProfilePhoto(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Available green interest options
   const greenInterestOptions = [
     'Sustainable Clothing',
     'Eco-Friendly Home Goods',
@@ -78,47 +63,41 @@ const ProfilePage: React.FC = () => {
     'Other',
   ];
 
-  const handleNewInterestChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement; // Type assertion
-    
+  const handleNewInterestChange = (e) => {
+    const { name, value, type } = e.target;
     if (type === 'checkbox') {
-      const { checked } = e.target as HTMLInputElement;
-      setNewInterest({
-        ...newInterest,
-        [name]: checked
-      });
+      setNewInterest({ ...newInterest, [name]: e.target.checked });
     } else {
       setNewInterest({
         ...newInterest,
-        [name]: name === 'costPerUnit' ? (value ? parseFloat(value) : undefined) : value
+        [name]: name === 'costPerUnit' ? (value ? parseFloat(value) : undefined) : value,
       });
     }
   };
 
   const addNewInterest = () => {
-    if (newInterest.productDescription.trim() === '') {
+    if (!newInterest.productDescription.trim()) {
       alert('Please describe what product you are looking for');
       return;
     }
-    
     setGreenInterests([...greenInterests, newInterest]);
     setNewInterest({
       category: 'Sustainable Clothing',
       productDescription: '',
       organization: '',
       costPerUnit: undefined,
-      notificationsEnabled: true
+      notificationsEnabled: true,
     });
     setIsAddingInterest(false);
   };
 
-  const removeInterest = (index: number) => {
+  const removeInterest = (index) => {
     const updatedInterests = [...greenInterests];
     updatedInterests.splice(index, 1);
     setGreenInterests(updatedInterests);
   };
 
-  const toggleNotification = (index: number) => {
+  const toggleNotification = (index) => {
     const updatedInterests = [...greenInterests];
     updatedInterests[index].notificationsEnabled = !updatedInterests[index].notificationsEnabled;
     setGreenInterests(updatedInterests);
@@ -127,11 +106,12 @@ const ProfilePage: React.FC = () => {
   const saveInterests = async () => {
     setIsSaving(true);
     try {
-      // Here you would typically send the data to your backend
       console.log('Saving interests:', greenInterests);
+      // Uncomment and adjust if you add a backend endpoint:
+      // await api.post('/api/user/interests/', { interests: greenInterests });
       setIsEditingInterests(false);
     } catch (error) {
-      console.error('Failed to update interests:', error);
+      console.error('Failed to update interests:', error.response?.data || error.message);
     } finally {
       setIsSaving(false);
     }
@@ -152,11 +132,7 @@ const ProfilePage: React.FC = () => {
           <div className="profile-photo-container">
             <label htmlFor="photo-upload" className="photo-upload-label">
               {profilePhoto ? (
-                <img
-                  src={profilePhoto}
-                  alt={user.name}
-                  className="profile-photo"
-                />
+                <img src={profilePhoto} alt={user.username} className="profile-photo" />
               ) : (
                 <User className="profile-photo-placeholder" />
               )}
@@ -172,16 +148,17 @@ const ProfilePage: React.FC = () => {
               className="photo-upload-input"
             />
           </div>
-          <h1 className="profile-name">{user.name}</h1>
+          <h1 className="profile-name">{user.username}</h1>
+          <p className="profile-email">{user.email}</p>
         </div>
 
         <div className="profile-stats">
           <div className="stat-item">
-            <span className="stat-number">{user.productsBought}</span>
+            <span className="stat-number">{user.productsBought || 0}</span>
             <span className="stat-label">Products Bought</span>
           </div>
           <div className="stat-item">
-            <span className="stat-number">{user.productsSold}</span>
+            <span className="stat-number">{user.productsSold || 0}</span>
             <span className="stat-label">Products Sold</span>
           </div>
         </div>
@@ -203,7 +180,7 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {isEditingInterests && !isAddingInterest && (
-            <button 
+            <button
               className="add-interest-button"
               onClick={() => setIsAddingInterest(true)}
             >
@@ -215,7 +192,6 @@ const ProfilePage: React.FC = () => {
           {isAddingInterest && (
             <div className="add-interest-form">
               <h3>Get notified when these green products are posted</h3>
-              
               <div className="form-group">
                 <label htmlFor="category">Category:</label>
                 <select
@@ -225,12 +201,13 @@ const ProfilePage: React.FC = () => {
                   onChange={handleNewInterestChange}
                   className="form-select"
                 >
-                  {greenInterestOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                  {greenInterestOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
               </div>
-              
               <div className="form-group">
                 <label htmlFor="productDescription">What product are you looking for? *</label>
                 <textarea
@@ -243,7 +220,6 @@ const ProfilePage: React.FC = () => {
                   required
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="organization">Preferred Organization/Brand (optional):</label>
                 <input
@@ -256,7 +232,6 @@ const ProfilePage: React.FC = () => {
                   placeholder="e.g., Patagonia, ThredUp, etc."
                 />
               </div>
-              
               <div className="form-group">
                 <label htmlFor="costPerUnit">Maximum Price (optional):</label>
                 <input
@@ -271,7 +246,6 @@ const ProfilePage: React.FC = () => {
                   step="0.01"
                 />
               </div>
-              
               <div className="form-group">
                 <div className="notification-toggle">
                   <label htmlFor="notificationsEnabled">Enable notifications:</label>
@@ -287,18 +261,14 @@ const ProfilePage: React.FC = () => {
                   </label>
                 </div>
               </div>
-              
               <div className="form-actions">
-                <button 
+                <button
                   className="cancel-button"
                   onClick={() => setIsAddingInterest(false)}
                 >
                   Cancel
                 </button>
-                <button 
-                  className="save-button"
-                  onClick={addNewInterest}
-                >
+                <button className="save-button" onClick={addNewInterest}>
                   Add Alert
                 </button>
               </div>
@@ -320,7 +290,7 @@ const ProfilePage: React.FC = () => {
                         {interest.category}
                       </h3>
                       {isEditingInterests && (
-                        <button 
+                        <button
                           className="remove-interest-button"
                           onClick={() => removeInterest(index)}
                         >
@@ -334,9 +304,8 @@ const ProfilePage: React.FC = () => {
                         <p><strong>From:</strong> {interest.organization}</p>
                       )}
                       {interest.costPerUnit && (
-                        <p><strong>Max Price:</strong> ${interest.costPerUnit.toFixed(2)}</p>
+                        <p><strong>Max Price:</strong> ₹{interest.costPerUnit.toFixed(2)}</p>
                       )}
-                      
                       {isEditingInterests && (
                         <div className="notification-preferences">
                           <div className="notification-toggle">
@@ -367,11 +336,19 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
       </main>
-
-      {/* Mobile Bottom Navbar */}
-     
+      <MobileNavbar />
     </div>
   );
 };
 
 export default ProfilePage;
+
+const greenInterestOptions = [
+  'Sustainable Clothing',
+  'Eco-Friendly Home Goods',
+  'Recycled Electronics',
+  'Sustainable Packaging',
+  'Upcycled Furniture',
+  'Green Accessories',
+  'Other',
+];

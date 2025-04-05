@@ -1,29 +1,15 @@
 import { useState, useRef } from "react";
-
-type User = {
-  id: number;
-  username: string;
-  email: string;
-};
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-};
-
-type Request = {
-  id: number;
-  title: string;
-  status: string;
-};
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import MobileNavbar from "../components/MobileNavbar.jsx";
+import api from "../api";
 
 export default function SearchTabs() {
-  const [activeTab, setActiveTab] = useState<"user" | "product" | "request">("user");
+  const [activeTab, setActiveTab] = useState("user");
   const [searchValue, setSearchValue] = useState("");
-  const [results, setResults] = useState<User[] | Product[] | Request[] | null>(null);
+  const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef(null);
+  const navigate = useNavigate(); // For navigation
 
   const tabs = [
     { key: "user", label: "User" },
@@ -31,10 +17,16 @@ export default function SearchTabs() {
     { key: "request", label: "Request" },
   ];
 
-  const tabPlaceholders: Record<"user" | "product" | "request", string> = {
-    user: "Search by user...",
-    product: "Search by product...",
-    request: "Search by request...",
+  const tabPlaceholders = {
+    user: "Search by username...",
+    product: "Search by product name...",
+    request: "Search by request name...",
+  };
+
+  const endpointMap = {
+    user: "/api/users/",
+    product: "/api/listings/",
+    request: "/api/requests/",
   };
 
   const placeholder = tabPlaceholders[activeTab];
@@ -42,19 +34,12 @@ export default function SearchTabs() {
   const handleSearch = async () => {
     if (!searchValue.trim()) return;
 
-    const endpointMap: Record<"user" | "product" | "request", string> = {
-      user: "user",
-      product: "product",
-      request: "request",
-    };
-
-    const API_URL = import.meta.env.VITE_API_URL;
-
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}api/search/${endpointMap[activeTab]}/?q=${searchValue}`);
-      const data = await response.json();
-      setResults(data.results);
+      const response = await api.get(endpointMap[activeTab], {
+        params: { q: searchValue },
+      });
+      setResults(response.data);
     } catch (error) {
       console.error(`Error fetching ${activeTab} search:`, error);
     } finally {
@@ -62,15 +47,24 @@ export default function SearchTabs() {
     }
   };
 
+  const handleViewDetails = (id) => {
+    if (activeTab === "user") {
+      navigate(`/user/${id}`); // Placeholder for user detail route
+    } else if (activeTab === "product") {
+      navigate(`/listings/view/${id}`);
+    } else if (activeTab === "request") {
+      navigate(`/requests/view/${id}`);
+    }
+  };
+
   return (
     <div style={styles.wrapper}>
-      {/* Tabs */}
       <div style={styles.tabList}>
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => {
-              setActiveTab(tab.key as "user" | "product" | "request");
+              setActiveTab(tab.key);
               setSearchValue("");
               setResults(null);
               inputRef.current?.focus();
@@ -85,7 +79,6 @@ export default function SearchTabs() {
         ))}
       </div>
 
-      {/* Search Input */}
       <div style={styles.inputWrapper}>
         <input
           ref={inputRef}
@@ -102,16 +95,14 @@ export default function SearchTabs() {
         </button>
       </div>
 
-      {/* Loading */}
       {loading && <p style={styles.loadingText}>Searching...</p>}
 
-      {/* Results */}
       {results && (
         <div style={styles.resultsContainer}>
           {results.length === 0 ? (
             <p style={styles.noResults}>No results found.</p>
           ) : (
-            results.map((item: any) => (
+            results.map((item) => (
               <div key={item.id} style={styles.resultCard}>
                 {activeTab === "user" && (
                   <>
@@ -122,20 +113,27 @@ export default function SearchTabs() {
                 {activeTab === "product" && (
                   <>
                     <p style={styles.resultName}>{item.name}</p>
-                    <p style={styles.resultEmail}>Price: ${item.price}</p>
+                    <p style={styles.resultEmail}>Cost: ₹{item.cost}</p>
                   </>
                 )}
                 {activeTab === "request" && (
                   <>
-                    <p style={styles.resultName}>{item.title}</p>
-                    <p style={styles.resultEmail}>Status: {item.status}</p>
+                    <p style={styles.resultName}>{item.request_name}</p>
+                    <p style={styles.resultEmail}>Max Price: ₹{item.max_price}</p>
                   </>
                 )}
+                <button
+                  onClick={() => handleViewDetails(item.id)}
+                  style={styles.viewButton}
+                >
+                  View Details
+                </button>
               </div>
             ))
           )}
         </div>
       )}
+      <MobileNavbar />
     </div>
   );
 }
@@ -143,24 +141,22 @@ export default function SearchTabs() {
 const styles = {
   wrapper: {
     display: "flex",
-    flexDirection: "column" as const,
-    // Removed alignItems: "center" to allow left alignment
-    paddingTop: "20px",
-    backgroundColor: "#ffffff",
+    flexDirection: "column",
     minHeight: "100vh",
-    width: "100%", // Full width of the container
-    maxWidth: "100%", // Allow full stretching
-    boxSizing: "border-box" as const,
+    width: "100vw",
+    padding: "0",
+    backgroundColor: "#ffffff",
+    boxSizing: "border-box",
+    margin: "0",
   },
   tabList: {
     display: "flex",
-    margin: "20px 0", // Removed "auto" to prevent centering, keeping left alignment
+    margin: "20px 10px",
     border: "1px solid #c5dacd",
     borderRadius: "6px",
     overflow: "hidden",
     backgroundColor: "#f2f9f4",
-    width: "100%", // Full width, but aligned to the left
-    maxWidth: "none", // Allow full stretching
+    width: "calc(100% - 20px)",
   },
   tabButton: {
     flex: 1,
@@ -181,9 +177,8 @@ const styles = {
     position: "relative",
     display: "flex",
     alignItems: "center",
-    margin: "18px 0", // Removed "auto" to prevent centering
-    width: "100%", // Corrected from "120%" to "100%"
-    maxWidth: "none", // Allow full stretching
+    margin: "18px 10px",
+    width: "calc(100% - 20px)",
   },
   input: {
     width: "100%",
@@ -193,7 +188,7 @@ const styles = {
     fontSize: "16px",
     outline: "none",
     backgroundColor: "#f8fbf9",
-    boxSizing: "border-box" as const,
+    boxSizing: "border-box",
   },
   searchButton: {
     position: "absolute",
@@ -210,12 +205,12 @@ const styles = {
     marginTop: "16px",
     fontSize: "14px",
     color: "#666",
-    textAlign: "center" as const,
+    textAlign: "center",
   },
   resultsContainer: {
-    marginTop: "20px",
-    width: "100%", // Corrected from "400%" to "100%"
-    maxWidth: "none", // Allow full stretching
+    margin: "20px 10px",
+    width: "calc(100% - 20px)",
+    flexGrow: 1,
   },
   resultCard: {
     backgroundColor: "#f1f8f3",
@@ -224,6 +219,9 @@ const styles = {
     marginBottom: "12px",
     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
     border: "1px solid #d3e7d6",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
   resultName: {
     fontSize: "16px",
@@ -233,13 +231,22 @@ const styles = {
   },
   resultEmail: {
     fontSize: "14px",
-    margin: 0,
+    margin: "0 0 8px",
     color: "#4f6d58",
   },
   noResults: {
-    textAlign: "center" as const,
+    textAlign: "center",
     color: "#889c91",
     fontSize: "14px",
     marginTop: "10px",
+  },
+  viewButton: {
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    padding: "6px 12px",
+    cursor: "pointer",
+    fontSize: "14px",
   },
 };

@@ -1,3 +1,4 @@
+# api/urls.py
 from django.urls import path
 from . import views
 
@@ -8,6 +9,7 @@ urlpatterns = [
     path("listings/create/", views.CreateListingView.as_view(), name="create-listing"),
     path("requests/", views.AllRequestsView.as_view(), name="all-requests"),
     path("listings/", views.AllListingsView.as_view(), name="all-listings"),
+    path("users/", views.AllUsersView.as_view(), name="all-users"),  # New endpoint
     path("requests/view/<int:pk>/", views.RequestView.as_view(), name="request-view"),
     path("listings/view/<int:pk>/", views.ListingView.as_view(), name="listing-view"),
 ]

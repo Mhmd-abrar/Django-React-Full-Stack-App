@@ -5,10 +5,9 @@ from .serializers import UserSerializer, UserActivitySerializer, RequestsSeriali
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import UserActivity, Requests, Listing
 from django.utils import timezone
-from django.db.models import Count
+from django.db.models import Count, Q
 from datetime import timedelta
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 class UserProfileView(views.APIView):
@@ -70,19 +69,39 @@ class CreateListingView(views.APIView):
         return Response(serializer.errors, status=400)
 
 class AllRequestsView(views.APIView):
-    permission_classes = [IsAuthenticated]  # Change to AllowAny for public access
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        requests = Requests.objects.all()
+        search_query = request.query_params.get("q", "")
+        requests = Requests.objects.filter(
+            Q(request_name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
         serializer = RequestsSerializer(requests, many=True)
         return Response(serializer.data)
 
 class AllListingsView(views.APIView):
-    permission_classes = [IsAuthenticated]  # Change to AllowAny for public access
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        listings = Listing.objects.all()
+        search_query = request.query_params.get("q", "")
+        listings = Listing.objects.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
         serializer = ListingSerializer(listings, many=True)
+        return Response(serializer.data)
+
+class AllUsersView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        search_query = request.query_params.get("q", "")
+        users = User.objects.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
 class RequestView(views.APIView):

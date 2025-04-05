@@ -1,14 +1,17 @@
+// src/App.jsx
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import MobileNavbar from "./components/MobileNavbar";
-import SustainableItemForm from "./components/SustainableItemForm"; // Import SustainableItemForm
-import ProductRequestForm from './pages/ProductRequestForm.jsx'; // Import ProductRequestForm
-
+import SustainableItemForm from "./components/SustainableItemForm";
+import ProductRequestForm from "./pages/ProductRequestForm.jsx";
+import SearchTabs from "./pages/searchpage.jsx"; // Assuming this is the correct path
+import RequestDetail from "./pages/RequestDetail.jsx";
+import ListingDetail from "./pages/ListingDetail.jsx";
+import ProfilePage from "./components/ProfilePage.jsx"; // Import ProfilePage
 
 function Logout() {
   localStorage.clear();
@@ -23,7 +26,7 @@ function RegisterAndLogout() {
 function App() {
   return (
     <BrowserRouter>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <div style={{ flex: 1 }}>
           <Routes>
             <Route
@@ -45,7 +48,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/request-product"
               element={
                 <ProtectedRoute>
@@ -53,10 +56,41 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/search"
+              element={
+                <ProtectedRoute>
+                  <SearchTabs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/requests/view/:id"
+              element={
+                <ProtectedRoute>
+                  <RequestDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/listings/view/:id"
+              element={
+                <ProtectedRoute>
+                  <ListingDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
-        
       </div>
     </BrowserRouter>
   );
