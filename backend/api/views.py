@@ -8,6 +8,8 @@ from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 class UserProfileView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -57,7 +59,7 @@ class CreateRequestView(views.APIView):
 
 class CreateListingView(views.APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]  # For handling file uploads
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
         data = request.data
@@ -66,3 +68,35 @@ class CreateListingView(views.APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+class AllRequestsView(views.APIView):
+    permission_classes = [IsAuthenticated]  # Change to AllowAny for public access
+
+    def get(self, request):
+        requests = Requests.objects.all()
+        serializer = RequestsSerializer(requests, many=True)
+        return Response(serializer.data)
+
+class AllListingsView(views.APIView):
+    permission_classes = [IsAuthenticated]  # Change to AllowAny for public access
+
+    def get(self, request):
+        listings = Listing.objects.all()
+        serializer = ListingSerializer(listings, many=True)
+        return Response(serializer.data)
+
+class RequestView(views.APIView):
+    permission_classes = [IsAuthenticated]  # Change to AllowAny for public access
+
+    def get(self, request, pk):
+        request_obj = get_object_or_404(Requests, pk=pk)
+        serializer = RequestsSerializer(request_obj)
+        return Response(serializer.data)
+
+class ListingView(views.APIView):
+    permission_classes = [IsAuthenticated]  # Change to AllowAny for public access
+
+    def get(self, request, pk):
+        listing = get_object_or_404(Listing, pk=pk)
+        serializer = ListingSerializer(listing)
+        return Response(serializer.data)
