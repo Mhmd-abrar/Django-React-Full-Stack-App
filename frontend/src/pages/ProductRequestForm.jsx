@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import MobileNavbar from "../components/MobileNavbar.jsx";
-
-
+import api from "../api"; // Import your API utility
 import '../styles/ProductRequestForm.css';
 
 const ProductRequestForm = () => {
@@ -17,24 +16,48 @@ const ProductRequestForm = () => {
   };
 
   const [formData, setFormData] = useState(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'maxPrice' ? parseFloat(value) : value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Product Request Submitted:', formData);
-    setFormData(initialFormState);
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post("/api/requests/create/", {
+        request_name: formData.requestName,
+        description: formData.description,
+        category: formData.category,
+        condition: formData.condition,
+        max_price: formData.maxPrice,
+        location: formData.location,
+        urgency: formData.urgency
+      });
+      console.log('Product Request Submitted:', response.data);
+      setSubmitSuccess(true);
+      setFormData(initialFormState);
+      setTimeout(() => setSubmitSuccess(false), 3000); // Clear success message after 3s
+    } catch (error) {
+      console.error('Error submitting request:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="product-request-form-container">
       <h2 className="form-title">Create Product Request</h2>
+      {submitSuccess && (
+        <div className="success-message">Request submitted successfully!</div>
+      )}
       <form onSubmit={handleSubmit} className="product-request-form-body">
         <div className="form-fields">
           <div className="form-group">
@@ -137,11 +160,11 @@ const ProductRequestForm = () => {
           </div>
         </div>
 
-        <button type="submit" className="submit-button">
-          <Send size={16} /> Submit Request
+        <button type="submit" className="submit-button" disabled={isSubmitting}>
+          <Send size={16} /> {isSubmitting ? 'Submitting...' : 'Submit Request'}
         </button>
       </form>
-      <MobileNavbar /> 
+      <MobileNavbar />
     </div>
   );
 };

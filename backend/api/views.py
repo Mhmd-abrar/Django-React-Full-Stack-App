@@ -1,9 +1,9 @@
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import generics, views
-from .serializers import UserSerializer, UserActivitySerializer
+from .serializers import UserSerializer, UserActivitySerializer, RequestsSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import UserActivity
+from .models import UserActivity, Requests
 from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
@@ -42,3 +42,14 @@ class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+class CreateRequestView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        serializer = RequestsSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # Associate request with authenticated user
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
