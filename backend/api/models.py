@@ -14,3 +14,23 @@ class UserActivity(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.activity_type} on {self.date}"
+
+class SustainableItem(models.Model):
+    CATEGORY_CHOICES = [
+        ('clothing', 'Sustainable Clothing'),
+        ('home', 'Eco-Friendly Home Goods'),
+        ('electronics', 'Recycled Electronics'),
+        ('packaging', 'Sustainable Packaging'),
+        ('furniture', 'Upcycled Furniture'),
+        ('accessories', 'Green Accessories'),
+        ('other', 'Other'),
+    ]
+
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    quantity = models.PositiveIntegerField()
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+
+    def _str_(self):
+        return self.name

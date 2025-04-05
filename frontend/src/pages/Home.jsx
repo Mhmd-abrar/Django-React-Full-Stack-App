@@ -16,18 +16,29 @@ function Home() {
       .then((res) => {
         setStats(res.data);
         if (chartRef.current) chartRef.current.destroy();
-        const ctx = canvasRef.current.getContext("2d");
-        chartRef.current = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: res.data.map((s) => s.date),
-            datasets: [{ label: "Login/Greeting Count", data: res.data.map((s) => s.count), borderColor: "#3b82f6", fill: false }],
-          },
-          options: { responsive: true, scales: { y: { beginAtZero: true } } },
-        });
+        if (canvasRef.current) { // Add this check
+          const ctx = canvasRef.current.getContext("2d");
+          chartRef.current = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: res.data.map((s) => s.date),
+              datasets: [
+                {
+                  label: "Login/Greeting Count",
+                  data: res.data.map((s) => s.count),
+                  borderColor: "#3b82f6",
+                  fill: false,
+                },
+              ],
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } },
+          });
+        }
       })
       .catch((err) => alert(err));
-    return () => { if (chartRef.current) chartRef.current.destroy(); };
+    return () => {
+      if (chartRef.current) chartRef.current.destroy();
+    };
   }, []);
 
   return (
