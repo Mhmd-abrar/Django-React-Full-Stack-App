@@ -7,6 +7,8 @@ const ListingDetail = () => {
   const { id } = useParams();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 
   useEffect(() => {
     api.get(`/api/listings/view/${id}/`)
@@ -29,7 +31,8 @@ const ListingDetail = () => {
       <p>Description: {listing.description}</p>
       <p>Quantity: {listing.quantity}</p>
       <p>Cost: ₹{listing.cost}</p>
-      {listing.image && <img src={listing.image} alt={listing.name} style={{ maxWidth: "100%", height: "auto" }} />}
+      {listing.image && <img src={`${BASE_URL}${listing.image}`} alt={listing.name} style={{ maxWidth: "100%", height: "auto" }} />
+    }
       <p>Category: {listing.category}</p>
       <MobileNavbar />
     </div>

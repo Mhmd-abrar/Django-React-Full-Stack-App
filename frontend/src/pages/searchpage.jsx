@@ -1,7 +1,9 @@
+// src/pages/searchpage.jsx
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import MobileNavbar from "../components/MobileNavbar.jsx";
 import api from "../api";
+import styles from "../styles/searchpageStyles.js";
 
 export default function SearchTabs() {
   const [activeTab, setActiveTab] = useState("user");
@@ -9,12 +11,13 @@ export default function SearchTabs() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
   const tabs = [
-    { key: "user", label: "User" },
     { key: "product", label: "Product" },
     { key: "request", label: "Request" },
+    { key: "user", label: "User" },
   ];
 
   const tabPlaceholders = {
@@ -39,6 +42,7 @@ export default function SearchTabs() {
       const response = await api.get(endpointMap[activeTab], {
         params: { q: searchValue },
       });
+      console.log("Search results:", response.data);
       setResults(response.data);
     } catch (error) {
       console.error(`Error fetching ${activeTab} search:`, error);
@@ -47,15 +51,21 @@ export default function SearchTabs() {
     }
   };
 
-  const handleViewDetails = (id) => {
+  const handleViewDetails = (item) => {
+    const { id } = item;
+    if (!id) {
+      console.error("ID is undefined for navigation", item);
+      return;
+    }
     if (activeTab === "user") {
-      navigate(`/user/${id}`); // Placeholder for user detail route
+      navigate(`/user/${id}`);
     } else if (activeTab === "product") {
       navigate(`/listings/view/${id}`);
     } else if (activeTab === "request") {
       navigate(`/requests/view/${id}`);
     }
   };
+  
 
   return (
     <div style={styles.wrapper}>
@@ -112,6 +122,13 @@ export default function SearchTabs() {
                 )}
                 {activeTab === "product" && (
                   <>
+                    {item.image && (
+                      <img
+                        src={`${BASE_URL}${item.image}`}
+                        alt={item.name}
+                        style={styles.resultImage}
+                      />
+                    )}
                     <p style={styles.resultName}>{item.name}</p>
                     <p style={styles.resultEmail}>Cost: ₹{item.cost}</p>
                   </>
@@ -123,7 +140,7 @@ export default function SearchTabs() {
                   </>
                 )}
                 <button
-                  onClick={() => handleViewDetails(item.id)}
+                  onClick={() => handleViewDetails(item)}
                   style={styles.viewButton}
                 >
                   View Details
@@ -137,116 +154,3 @@ export default function SearchTabs() {
     </div>
   );
 }
-
-const styles = {
-  wrapper: {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-    width: "100vw",
-    padding: "0",
-    backgroundColor: "#ffffff",
-    boxSizing: "border-box",
-    margin: "0",
-  },
-  tabList: {
-    display: "flex",
-    margin: "20px 10px",
-    border: "1px solid #c5dacd",
-    borderRadius: "6px",
-    overflow: "hidden",
-    backgroundColor: "#f2f9f4",
-    width: "calc(100% - 20px)",
-  },
-  tabButton: {
-    flex: 1,
-    padding: "12px 0",
-    backgroundColor: "#f2f9f4",
-    border: "none",
-    fontSize: "16px",
-    color: "#3d5943",
-    cursor: "pointer",
-  },
-  activeTab: {
-    backgroundColor: "#d9e8dc",
-    color: "#2f4936",
-    fontWeight: "bold",
-    borderBottom: "2px solid #5fa86f",
-  },
-  inputWrapper: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    margin: "18px 10px",
-    width: "calc(100% - 20px)",
-  },
-  input: {
-    width: "100%",
-    padding: "14px 48px 14px 14px",
-    borderRadius: "6px",
-    border: "1px solid #b7d2bd",
-    fontSize: "16px",
-    outline: "none",
-    backgroundColor: "#f8fbf9",
-    boxSizing: "border-box",
-  },
-  searchButton: {
-    position: "absolute",
-    right: "10px",
-    background: "#5fa86f",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    padding: "8px 12px",
-    cursor: "pointer",
-    fontSize: "16px",
-  },
-  loadingText: {
-    marginTop: "16px",
-    fontSize: "14px",
-    color: "#666",
-    textAlign: "center",
-  },
-  resultsContainer: {
-    margin: "20px 10px",
-    width: "calc(100% - 20px)",
-    flexGrow: 1,
-  },
-  resultCard: {
-    backgroundColor: "#f1f8f3",
-    borderRadius: "6px",
-    padding: "12px 16px",
-    marginBottom: "12px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-    border: "1px solid #d3e7d6",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-  },
-  resultName: {
-    fontSize: "16px",
-    fontWeight: "bold",
-    margin: "0 0 4px",
-    color: "#2f4936",
-  },
-  resultEmail: {
-    fontSize: "14px",
-    margin: "0 0 8px",
-    color: "#4f6d58",
-  },
-  noResults: {
-    textAlign: "center",
-    color: "#889c91",
-    fontSize: "14px",
-    marginTop: "10px",
-  },
-  viewButton: {
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    padding: "6px 12px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-};

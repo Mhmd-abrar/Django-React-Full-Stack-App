@@ -7,6 +7,8 @@ const RequestDetail = () => {
   const { id } = useParams();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 
   useEffect(() => {
     api.get(`/api/requests/view/${id}/`)
@@ -32,7 +34,16 @@ const RequestDetail = () => {
       <p>Max Price: ₹{request.max_price}</p>
       <p>Location: {request.location}</p>
       <p>Urgency: {request.urgency}</p>
+      {request.image && (
+  <img
+    src={`${BASE_URL}${request.image}`}
+    alt={request.request_name}
+    style={{ maxWidth: "100%", height: "auto", marginTop: "10px" }}
+  />
+)}
+
       <MobileNavbar />
+
     </div>
   );
 };
