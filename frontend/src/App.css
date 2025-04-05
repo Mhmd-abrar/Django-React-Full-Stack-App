@@ -1,1 +1,25 @@
-@import "tailwindcss";
+/* src/App.css */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+  
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .app-container {
+    flex: 1;
+  }
+  
+  @media (max-width: 640px) {
+    .app-container {
+    }
+  }
+  

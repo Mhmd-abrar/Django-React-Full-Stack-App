@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { PlusCircle, Upload } from 'lucide-react';
 import '../styles/SustainableItemForm.css';
+import MobileNavbar from "../components/MobileNavbar.jsx";
+
 
 const SustainableItemForm = () => {
   const [formData, setFormData] = useState({
@@ -79,15 +81,7 @@ const SustainableItemForm = () => {
 
   return (
     <div className="app-container">
-      <main className="main-content">
-        <div className="intro-section">
-          <h2 className="intro-title">Join the Circular Economy</h2>
-          <p className="intro-text">
-            List your sustainable products and contribute to a more circular economy. 
-            Every reused or recycled item helps reduce waste and conserve resources.
-          </p>
-        </div>
-      </main>
+      
 
       <div className="form-container">
         <h2 className="form-title">List Your Sustainable Item</h2>
@@ -252,7 +246,9 @@ const SustainableItemForm = () => {
             </button>
           </div>
         </form>
+        <MobileNavbar />  
       </div>
+      
     </div>
   );
 };
