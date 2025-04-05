@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserActivity, Requests
+from .models import UserActivity, Requests, Listing
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +16,8 @@ class RequestsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Requests
         fields = ['request_name', 'description', 'category', 'condition', 'max_price', 'location', 'urgency']
+
+class ListingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Listing
+        fields = ['name', 'description', 'quantity', 'cost', 'image', 'category']

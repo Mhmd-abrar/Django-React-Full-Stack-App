@@ -13,25 +13,6 @@ class UserActivity(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.activity_type} on {self.date}"
 
-class SustainableItem(models.Model):
-    CATEGORY_CHOICES = [
-        ('clothing', 'Sustainable Clothing'),
-        ('home', 'Eco-Friendly Home Goods'),
-        ('electronics', 'Recycled Electronics'),
-        ('packaging', 'Sustainable Packaging'),
-        ('furniture', 'Upcycled Furniture'),
-        ('accessories', 'Green Accessories'),
-        ('other', 'Other'),
-    ]
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    quantity = models.PositiveIntegerField()
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-
-    def __str__(self):  # Fixed typo from _str_ to __str__
-        return self.name
-
 class Requests(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     request_name = models.CharField(max_length=255)
@@ -54,3 +35,26 @@ class Requests(models.Model):
 
     def __str__(self):
         return f"{self.request_name} by {self.user.username}"
+
+class Listing(models.Model):
+    CATEGORY_CHOICES = [
+        ('clothing', 'Sustainable Clothing'),
+        ('home', 'Eco-Friendly Home Goods'),
+        ('electronics', 'Recycled Electronics'),
+        ('packaging', 'Sustainable Packaging'),
+        ('furniture', 'Upcycled Furniture'),
+        ('accessories', 'Green Accessories'),
+        ('other', 'Other'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    quantity = models.PositiveIntegerField()
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to='listings/', null=True, blank=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} by {self.user.username}"

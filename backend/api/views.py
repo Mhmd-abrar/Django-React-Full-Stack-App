@@ -1,12 +1,13 @@
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import generics, views
-from .serializers import UserSerializer, UserActivitySerializer, RequestsSerializer
+from .serializers import UserSerializer, UserActivitySerializer, RequestsSerializer, ListingSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import UserActivity, Requests
+from .models import UserActivity, Requests, Listing
 from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class UserProfileView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -50,6 +51,18 @@ class CreateRequestView(views.APIView):
         data = request.data
         serializer = RequestsSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=request.user)  # Associate request with authenticated user
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class CreateListingView(views.APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # For handling file uploads
+
+    def post(self, request):
+        data = request.data
+        serializer = ListingSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)

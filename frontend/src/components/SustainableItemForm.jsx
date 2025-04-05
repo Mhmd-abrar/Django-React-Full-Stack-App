@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PlusCircle, Upload } from 'lucide-react';
 import '../styles/SustainableItemForm.css';
 import MobileNavbar from "../components/MobileNavbar.jsx";
-
+import api from "../api"; // Assuming this is your API utility
 
 const SustainableItemForm = () => {
   const [formData, setFormData] = useState({
@@ -45,9 +45,21 @@ const SustainableItemForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('quantity', formData.quantity);
+    formDataToSend.append('cost', formData.cost);
+    if (formData.image) formDataToSend.append('image', formData.image);
+    formDataToSend.append('category', formData.category);
+
     try {
-      console.log('Form Data Submitted:', formData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await api.post("/api/listings/create/", formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('Form Data Submitted:', response.data);
       setSubmitSuccess(true);
       setTimeout(() => {
         setFormData({
@@ -81,8 +93,6 @@ const SustainableItemForm = () => {
 
   return (
     <div className="app-container">
-      
-
       <div className="form-container">
         <h2 className="form-title">List Your Item</h2>
 
@@ -222,7 +232,6 @@ const SustainableItemForm = () => {
                         name="image"
                         type="file"
                         accept="image/*"
-                        required
                         onChange={handleImageChange}
                         className="hidden-input"
                       />
@@ -247,8 +256,7 @@ const SustainableItemForm = () => {
           </div>
         </form>
         <MobileNavbar />  
-      </div>x
-      
+      </div>
     </div>
   );
 };
