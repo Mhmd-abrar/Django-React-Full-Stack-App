@@ -7,6 +7,8 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MobileNavbar from "./components/MobileNavbar";
 import SustainableItemForm from "./components/SustainableItemForm"; // Import SustainableItemForm
+import ProductRequestForm from './pages/ProductRequestForm.jsx'; // Import ProductRequestForm
+
 
 function Logout() {
   localStorage.clear();
@@ -40,6 +42,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SustainableItemForm />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/request-product"
+              element={
+                <ProtectedRoute>
+                  <ProductRequestForm />
                 </ProtectedRoute>
               }
             />

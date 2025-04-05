@@ -1,41 +1,47 @@
-/* File: src/components/SustainableItemForm.css */
+/* SustainableItemForm.css */
+
+/* App Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
 
 /* Form Container */
 .form-container {
-  max-width: 500px; /* Reduced max-width for a simpler look */
-  margin: 20px auto; /* Added margin for spacing */
-  padding: 30px; /* Increased padding */
-  background-color: #f9f9f9; /* Light grey background */
-  border-radius: 10px; /* More rounded corners */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Softer shadow */
+  max-width: 80%; /* Reduced max-width to 80% of the screen */
+  margin: 20px auto;
+  padding: 20px; /* Reduced padding */
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  flex: 1; /* Allows it to grow but not exceed content */
 }
 
 /* Adjust form container for smaller screens */
 @media (max-width: 576px) {
   .form-container {
-    max-width: 100%; /* Make form container full width on smaller screens */
-    margin-left: 10px;
-    margin-right: 10px;
-    padding: 20px; /* Reduce padding for smaller screens */
+    max-width: 90%; /* Slightly smaller on mobile */
+    padding: 15px;
   }
 }
 
 /* Title */
 .form-title {
-  font-size: 28px; /* Larger title */
-  font-weight: bold; /* Bold font weight */
-  color: #333; /* Darker text color */
-  margin-bottom: 30px; /* Increased margin */
-  text-align: center; /* Center align title */
+  font-size: 24px; /* Reduced size */
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 /* Success Message */
 .success-message {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #e6f7ff; /* Light blue for success */
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #e6f7ff;
   border: 1px solid #91d5ff;
-  color: #096dd9; /* Darker blue text */
+  color: #096dd9;
   border-radius: 5px;
   text-align: center;
 }
@@ -44,7 +50,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Increased gap */
+  gap: 15px; /* Reduced gap */
 }
 
 /* Group */
@@ -57,32 +63,31 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px; /* Increased gap */
+  gap: 15px;
 }
 
 @media (min-width: 576px) {
   .form-row {
-    grid-template-columns: 1fr 1fr; /* Two columns on larger screens */
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 /* Label */
 .form-label {
-  display: block;
-  font-size: 16px; /* Slightly larger label */
+  font-size: 14px; /* Reduced size */
   font-weight: 500;
-  color: #555; /* Medium grey color */
-  margin-bottom: 8px; /* Increased margin */
+  color: #555;
+  margin-bottom: 6px;
 }
 
 /* Input, Textarea, Select */
 .form-input {
   width: 100%;
-  padding: 12px 15px; /* Adjusted padding */
-  border: 1px solid #ddd; /* Lighter border */
-  border-radius: 8px; /* More rounded inputs */
+  padding: 10px 12px; /* Reduced padding */
+  border: 1px solid #ddd;
+  border-radius: 6px;
   transition: border-color 0.3s;
-  font-size: 16px;
+  font-size: 14px; /* Reduced size */
   color: #333;
   background-color: white;
   box-sizing: border-box;
@@ -90,8 +95,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #007bff; /* Focus color */
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Focus shadow */
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 /* Responsive Select */
@@ -99,101 +104,99 @@ select.form-input {
   appearance: none;
   background-image: url("data:image/svg+xml;utf8,<svg fill='%23777' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
   background-repeat: no-repeat;
-  background-position: right 15px center; /* Adjusted position */
-  background-size: 16px;
+  background-position: right 12px center;
+  background-size: 14px;
   cursor: pointer;
 }
 
 /* Image Upload */
 .image-upload-container {
-  margin-top: 8px;
-  padding: 20px; /* Adjusted padding - reduced padding */
-  border: 2px dashed #ccc; /* Lighter dashed border */
-  border-radius: 8px;
+  margin-top: 6px;
+  padding: 15px; /* Reduced padding */
+  border: 2px dashed #ccc;
+  border-radius: 6px;
   text-align: center;
   transition: border-color 0.3s;
-  width: 100%; /* Added width 100% to ensure it fits container */
-  box-sizing: border-box; /* Added box-sizing to include padding and border in width */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .image-upload-container:hover {
-  border-color: #007bff; /* Hover border color */
+  border-color: #007bff;
 }
 
 .image-preview-container {
-  margin-bottom: 15px; /* Adjusted margin */
-  width: 100%; /* Ensure container takes full width */
-  box-sizing: border-box; /* Include padding and border in width */
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .image-preview {
-  max-height: 150px; /* Adjusted max height - reduced height */
-  width: 100%; /* Make image responsive within its container */
-  border-radius: 8px;
-  margin-bottom: 10px; /* Adjusted margin */
+  max-height: 120px; /* Reduced size */
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  object-fit: contain; /* Ensure image scales down and fits without cropping */
+  object-fit: contain;
 }
 
 .change-image-btn,
 .upload-btn {
   cursor: pointer;
-  display: inline-block;
-  padding: 8px 12px; /* Adjusted padding - reduced padding */
-  font-size: 14px; /* Adjusted font size */
-  color: #007bff; /* Button text color */
+  padding: 6px 10px; /* Reduced padding */
+  font-size: 12px; /* Reduced size */
+  color: #007bff;
   background-color: #fff;
-  border: 1px solid #007bff; /* Button border color */
-  border-radius: 5px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
   transition: all 0.3s;
 }
 
 .change-image-btn:hover,
 .upload-btn:hover {
-  background-color: #007bff; /* Button background hover */
-  color: white; /* Button text hover */
+  background-color: #007bff;
+  color: white;
 }
 
 .upload-icon {
-  height: 40px; /* Adjusted icon size */
-  width: 40px; /* Adjusted icon size */
-  color: #999; /* Light grey icon color */
-  margin-bottom: 8px; /* Adjusted margin */
+  height: 30px; /* Reduced size */
+  width: 30px;
+  color: #999;
+  margin-bottom: 6px;
 }
 
 .upload-text {
-  font-size: 15px; /* Adjusted font size */
-  color: #777; /* Medium grey text */
-  margin-bottom: 4px; /* Adjusted margin */
+  font-size: 13px; /* Reduced size */
+  color: #777;
+  margin-bottom: 3px;
 }
 
 .upload-info {
-  font-size: 12px; /* Adjusted font size */
+  font-size: 11px; /* Reduced size */
   color: #999;
 }
 
 /* Submit Button */
 .button-container {
   display: flex;
-  justify-content: center; /* Center align button */
-  margin-top: 20px;
-  margin-bottom: 60px; /* Increased margin-bottom to accommodate mobile navbar */
+  justify-content: center;
+  margin-top: 15px; /* Reduced margin */
+  padding-bottom: 60px; /* Space for fixed navbar */
 }
 
 @media (max-width: 640px) {
   .button-container {
-    margin-bottom: 50px; /* Adjust margin for smaller mobile navbar */
+    padding-bottom: 50px; /* Adjust for smaller screens */
   }
 }
 
-
 .submit-button {
-  padding: 12px 30px; /* Adjusted padding */
-  background-color: #28a745; /* Green submit button */
+  padding: 10px 25px; /* Reduced padding */
+  background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 18px; /* Larger font size */
+  border-radius: 6px;
+  font-size: 16px; /* Reduced size */
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
@@ -201,12 +204,12 @@ select.form-input {
 }
 
 .submit-button:hover {
-  background-color: #218838; /* Darker green on hover */
+  background-color: #218838;
 }
 
 .submit-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.5); /* Focus shadow */
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.5);
 }
 
 .submit-button.disabled {
@@ -215,7 +218,8 @@ select.form-input {
 }
 
 .button-icon {
-  margin-right: 10px;
-  height: 22px;
-  width: 22px;
+  margin-right: 8px;
+  height: 18px; /* Reduced size */
+  width: 18px;
 }
+

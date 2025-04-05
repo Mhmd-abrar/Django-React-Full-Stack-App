@@ -28,7 +28,7 @@ const MobileNavbar = () => {
           </Link>
         </li>
         <li>
-          <Link to="#" className="mobile-nav-link">
+          <Link to="/request-product" className={`mobile-nav-link ${location.pathname === '/request-product' ? 'active' : ''}`}>
             <Send className="mobile-nav-icon" />
             <span>Request</span>
           </Link>

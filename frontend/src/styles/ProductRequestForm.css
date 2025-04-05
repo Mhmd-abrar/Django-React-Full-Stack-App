@@ -1,0 +1,30 @@
+.buyer-request-page {
+    background: linear-gradient(
+      135deg,
+      #a8e6cf,   /* soft mint green */
+      #dcedc1,   /* light eco green */
+      #ffd3b6,   /* warm earth tone */
+      #ffaaa5,   /* soft coral */
+      #fff9c4    /* soft yellow sunlight */
+    );
+    background-size: 400% 400%;
+    animation: sustainableFlow 20s ease infinite;
+  
+    padding: 2rem;
+    min-height: 100vh; /* Ensure full viewport coverage */
+    text-align: center;
+  }
+  
+  @keyframes sustainableFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .buyer-request-page h1 {
+    color: #1976D2; /* Darker blue for contrast with tagline */
+  }
+  
+  .buyer-request-page p {
+    color: #42A5F5; /* Medium blue for description */
+  }

@@ -7,19 +7,20 @@ body {
     color: #333;
     overflow-x: hidden; /* Prevent horizontal scrolling */
   }
-  
+
   #root {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
   }
-  
+
   .app-container {
     flex: 1;
+    padding-bottom: 60px; /* Add padding at the bottom for the fixed navbar */
   }
-  
+
   @media (max-width: 640px) {
     .app-container {
+      padding-bottom: 50px; /* Adjust padding for smaller mobile navbar */
     }
   }
-  

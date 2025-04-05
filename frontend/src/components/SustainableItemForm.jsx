@@ -84,7 +84,7 @@ const SustainableItemForm = () => {
       
 
       <div className="form-container">
-        <h2 className="form-title">List Your Sustainable Item</h2>
+        <h2 className="form-title">List Your Item</h2>
 
         {submitSuccess && (
           <div className="success-message">
@@ -247,7 +247,7 @@ const SustainableItemForm = () => {
           </div>
         </form>
         <MobileNavbar />  
-      </div>
+      </div>x
       
     </div>
   );

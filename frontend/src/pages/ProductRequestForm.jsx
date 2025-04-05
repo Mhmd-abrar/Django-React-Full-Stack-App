@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { ProductRequest } from '../types/productTypes';
 import { Send } from 'lucide-react';
+import MobileNavbar from "../components/MobileNavbar.jsx";
+
 
 import '../styles/ProductRequestForm.css';
 
-const ProductRequestForm: React.FC = () => {
-  const initialFormState: ProductRequest = {
+const ProductRequestForm = () => {
+  const initialFormState = {
     requestName: '',
     description: '',
     category: '',
@@ -15,9 +16,9 @@ const ProductRequestForm: React.FC = () => {
     urgency: 'Medium'
   };
 
-  const [formData, setFormData] = useState<ProductRequest>(initialFormState);
+  const [formData, setFormData] = useState(initialFormState);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -25,7 +26,7 @@ const ProductRequestForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Product Request Submitted:', formData);
     setFormData(initialFormState);
@@ -116,7 +117,7 @@ const ProductRequestForm: React.FC = () => {
               value={formData.location}
               onChange={handleChange}
               required
-              placeholder="e.g.,Chennai , Trichy"
+              placeholder="e.g., Chennai, Trichy"
             />
           </div>
 
@@ -140,6 +141,7 @@ const ProductRequestForm: React.FC = () => {
           <Send size={16} /> Submit Request
         </button>
       </form>
+      <MobileNavbar /> 
     </div>
   );
 };
